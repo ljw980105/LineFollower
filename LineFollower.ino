@@ -5,20 +5,21 @@
  * play / pause button FF02FD
  * up button right of VOL-: FF906F
  * down button left of VOL-: FFE01F
+ * Important Note: Pin 3 is damaged!
  */
 
-#define leftIR 5
-#define rightIR 6
-#define IRReceiver 7
-#define statusLED 8
+#define leftIR 6
+#define rightIR 7
+#define IRReceiver 8
+#define statusLED 9
 // left motor
-#define leftMotor 2
-#define leftForwardDirection 3
+#define leftMotor 5 // pin 3 is damaged! - using pin 5 as pwm
+#define leftForwardDirection 2
 #define leftReverseDirection 4
 // right motor
-#define rightMotor 9
-#define rightForwardDirection 10
-#define rightReverseDirection 11
+#define rightMotor 10 // 10 is a pwm pin
+#define rightForwardDirection 11
+#define rightReverseDirection 12
 
 IRrecv receiver(IRReceiver);
 decode_results results;
@@ -66,22 +67,20 @@ void loop() {
     } else { // start the robot
         digitalWrite(statusLED, HIGH);
 
-//        /*
         analogWrite(leftMotor, leftSpeed);
-        digitalWrite(leftForwardDirection, HIGH);
-        digitalWrite(leftReverseDirection, LOW);
-//        */
+        digitalWrite(leftForwardDirection, LOW);
+        digitalWrite(leftReverseDirection, HIGH);
+
 //        controlMotors();
     }
-    delay(200);
 }
 
-#pragma markdriving methods
+#pragma mark driving methods
 
 void controlMotors() {
     // TODO: May need to change to high
-    int leftOnWhiteSurface = digitalRead(leftIR) == LOW;
-    int rightOnWhiteSurface = digitalRead(rightIR) == LOW;
+    bool leftOnWhiteSurface = digitalRead(leftIR) == LOW;
+    bool rightOnWhiteSurface = digitalRead(rightIR) == LOW;
 
     if ((leftOnWhiteSurface && rightOnWhiteSurface) || (!leftOnWhiteSurface && !rightOnWhiteSurface)) {
         straight();
@@ -113,7 +112,7 @@ void straight() {
     setDirections();
 }
 
-void stop () {
+void stop() {
     analogWrite(leftMotor, 0);
     analogWrite(rightMotor, 0);
 }
