@@ -13,20 +13,20 @@
 #define IRReceiver 8
 #define statusLED 9
 // left motor
-#define leftMotor 5 // pin 3 is damaged! - using pin 5 as pwm
-#define leftForwardDirection 2
-#define leftReverseDirection 4
+#define leftMotor 10 // pin 3 is damaged! - using pin 5 as pwm
+#define leftForwardDirection 11
+#define leftReverseDirection 12
 // right motor
-#define rightMotor 10 // 10 is a pwm pin
-#define rightForwardDirection 11
-#define rightReverseDirection 12
+#define rightMotor 5 // 10 is a pwm pin
+#define rightForwardDirection 2
+#define rightReverseDirection 4
 
 IRrecv receiver(IRReceiver);
 decode_results results;
 
 int state = 0;
-uint8_t leftSpeed = 100;
-uint8_t rightSpeed = 100;
+uint8_t leftSpeed = 140;
+uint8_t rightSpeed = 160;
 
 #pragma mark function prototypes
 
@@ -67,9 +67,13 @@ void loop() {
     } else { // start the robot
         digitalWrite(statusLED, HIGH);
 
-        analogWrite(leftMotor, leftSpeed);
-        digitalWrite(leftForwardDirection, LOW);
-        digitalWrite(leftReverseDirection, HIGH);
+        analogWrite(leftMotor, 200); // 140 - stable
+        digitalWrite(leftForwardDirection, HIGH);
+        digitalWrite(leftReverseDirection, LOW);
+
+        analogWrite(rightMotor, 200); // 160 - stable
+        digitalWrite(rightForwardDirection, HIGH);
+        digitalWrite(rightReverseDirection, LOW);
 
 //        controlMotors();
     }
