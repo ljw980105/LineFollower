@@ -8,16 +8,16 @@
  * Important Note: Pin 3 is damaged!
  */
 
-#define leftIR 6
-#define rightIR 7
+#define leftIR 7
+#define rightIR 6
 #define IRReceiver 8
 #define statusLED 9
 // left motor
-#define leftMotor 10 // pin 3 is damaged! - using pin 5 as pwm
+#define leftMotor 10 // 10 is a pwm pin
 #define leftForwardDirection 11
 #define leftReverseDirection 12
 // right motor
-#define rightMotor 5 // 10 is a pwm pin
+#define rightMotor 5 // pin 3 is damaged! - using pin 5 as pwm
 #define rightForwardDirection 2
 #define rightReverseDirection 4
 
@@ -25,8 +25,12 @@ IRrecv receiver(IRReceiver);
 decode_results results;
 
 int state = 0;
+
+/** below speeds are the optimal ones to compensate for the build quality
+ * between the left and right motors
+ */
 uint8_t leftSpeed = 140;
-uint8_t rightSpeed = 160;
+uint8_t rightSpeed = 200;
 
 #pragma mark function prototypes
 
@@ -67,22 +71,21 @@ void loop() {
     } else { // start the robot
         digitalWrite(statusLED, HIGH);
 
-        analogWrite(leftMotor, 200); // 140 - stable
-        digitalWrite(leftForwardDirection, HIGH);
-        digitalWrite(leftReverseDirection, LOW);
+//        analogWrite(leftMotor, leftSpeed); // 140 - stable
+//        digitalWrite(leftForwardDirection, HIGH);
+//        digitalWrite(leftReverseDirection, LOW);
+//
+//        analogWrite(rightMotor, rightSpeed); // 160 - stable
+//        digitalWrite(rightForwardDirection, HIGH);
+//        digitalWrite(rightReverseDirection, LOW);
 
-        analogWrite(rightMotor, 200); // 160 - stable
-        digitalWrite(rightForwardDirection, HIGH);
-        digitalWrite(rightReverseDirection, LOW);
-
-//        controlMotors();
+        controlMotors();
     }
 }
 
 #pragma mark driving methods
 
 void controlMotors() {
-    // TODO: May need to change to high
     bool leftOnWhiteSurface = digitalRead(leftIR) == LOW;
     bool rightOnWhiteSurface = digitalRead(rightIR) == LOW;
 
@@ -97,22 +100,32 @@ void controlMotors() {
     }
 }
 
+/**
+ * Keep turning left until a black surface is reached
+ */
 void left() {
-    digitalWrite(leftMotor, 150);
-    digitalWrite(rightMotor, 180);
-    setDirections();
+    while (digitalRead(rightIR) == LOW) { // if the right sensor is on the white surface
+        analogWrite(leftMotor, 255); // 180
+        analogWrite(rightMotor, 0); // 210
+        setDirections();
+    }
 }
 
+/**
+ * Keep turning right until a black surface is reached
+ */
 void right() {
-    digitalWrite(leftMotor, 180);
-    digitalWrite(rightMotor, 150);
-    setDirections();
+    while (digitalRead(leftIR) == LOW) { // if the left sensor is on the white surface
+        analogWrite(leftMotor, 0); // 210
+        analogWrite(rightMotor, 255); // 180
+        setDirections();
+    }
 }
 
 void straight() {
     // TODO: May need to use pid for more accurate results
-    digitalWrite(leftMotor, leftSpeed);
-    digitalWrite(rightMotor, rightSpeed);
+    analogWrite(leftMotor, leftSpeed);
+    analogWrite(rightMotor, rightSpeed);
     setDirections();
 }
 
