@@ -26,11 +26,14 @@ decode_results results;
 
 int state = 0;
 
+int leftTurnState = 0;
+int rightTurnState = 0;
+
 /** below speeds are the optimal ones to compensate for the build quality
  * between the left and right motors
  */
-uint8_t leftSpeed = 140;
-uint8_t rightSpeed = 200;
+uint8_t leftSpeed = 110;
+uint8_t rightSpeed = 180;
 
 #pragma mark function prototypes
 
@@ -105,9 +108,14 @@ void controlMotors() {
  */
 void left() {
     while (digitalRead(rightIR) == LOW) { // if the right sensor is on the white surface
-        analogWrite(leftMotor, 255); // 180
+        analogWrite(leftMotor, 220); // 180
         analogWrite(rightMotor, 0); // 210
         setDirections();
+        if (digitalRead(leftIR) == HIGH) leftTurnState = 1;
+        if (digitalRead(leftIR) == LOW && leftTurnState == 1) {
+            leftTurnState = 0;
+            break;
+        }
     }
 }
 
@@ -117,8 +125,13 @@ void left() {
 void right() {
     while (digitalRead(leftIR) == LOW) { // if the left sensor is on the white surface
         analogWrite(leftMotor, 0); // 210
-        analogWrite(rightMotor, 255); // 180
+        analogWrite(rightMotor, 220); // 180
         setDirections();
+        if (digitalRead(rightIR) == HIGH) rightTurnState = 1;
+        if (digitalRead(rightIR) == LOW && rightTurnState == 1) {
+            rightTurnState = 0;
+            break;
+        }
     }
 }
 
