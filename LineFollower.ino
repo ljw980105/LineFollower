@@ -32,8 +32,8 @@ int rightTurnState = 0;
 /** below speeds are the optimal ones to compensate for the build quality
  * between the left and right motors
  */
-uint8_t leftSpeed = 110;
-uint8_t rightSpeed = 180;
+uint8_t leftSpeed = 130;
+uint8_t rightSpeed = 200;
 
 #pragma mark function prototypes
 
